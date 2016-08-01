@@ -31,19 +31,22 @@ def intListToString(intList):
 	outString = outString[:3] + "|" + outString[3:]
 	return outString
 
-def addMarkupToMeasure(intList, measure):
+def makePedalMarkup(intList, measure):
 	pString = intListToString(intList)
 	scheme = schemetools.Scheme(pString, force_quotes=True)
 	markup = markuptools.Markup(markuptools.MarkupCommand('harp-pedal', scheme))
-	attach(markup, measure[0])
-
+	return markup
+	
 def intListToMeasure(intList):
 	pitchClasses = intListToPitchClasses(intList)	
 	sortedClasses = sortPitchClasses(pitchClasses)
 	pitches = classesToPitches(sortedClasses)
 	notes = pitchesToNotes(pitches)
 	measure = Measure((7,4), notes)
-	addMarkupToMeasure(intList, measure)
+	setMarkup = makeSetMarkup(measure)
+	pedalMarkup = makePedalMarkup(intList, measure)
+	markup = Markup.center_column([pedalMarkup, setMarkup], Down)
+	attach(markup, measure[0])
 	return measure
 	
 def makeChart():
@@ -51,8 +54,8 @@ def makeChart():
 	voice = Voice([])
 	intLists = list(product([-1,0,1],repeat=7))
 	for n,x in enumerate(intLists):
-		print('rendering', x)
 		voice.append(intListToMeasure(x))
+		print("rendering list", n)
 	staff.append(voice)
 	return staff
 		
